@@ -1,27 +1,23 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  OnInit
-} from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { catchError, EMPTY, exhaustMap, map, of, Subject, switchMap, takeUntil } from 'rxjs';
-import { ArticleService } from '../shared/data-access/apis/article.service';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { provideComponentStore } from '@ngrx/component-store';
+import { tap } from 'rxjs';
+import { ErrorsFormComponent } from 'src/app/shared/ui/errors-form/errors-form.component';
 import { Article } from '../shared/data-access/app.models';
-import { AuthService } from '../shared/data-access/auth.service';
-import { DestroyService } from '../shared/data-access/destroy.service';
-import { EditorService } from '../shared/data-access/apis/editor.service';
+import { EditorStore } from './editor.store';
 
 @Component({
   selector: 'conduit-editor',
-  template: `
+  template: `<ng-container *ngIf="vm$ | async as vm">
     <div class="editor-page">
       <div class="container page">
         <div class="row">
           <div class="col-md-10 offset-md-1 col-xs-12">
+            <ng-container *ngIf="vm.errors">
+              <conduit-errors-form [errors]="vm.errors"></conduit-errors-form>
+            </ng-container>
             <form [formGroup]="form">
               <fieldset>
                 <fieldset class="form-group">
@@ -76,98 +72,51 @@ import { EditorService } from '../shared/data-access/apis/editor.service';
         </div>
       </div>
     </div>
-  `,
+  </ng-container> `,
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, RouterModule, CommonModule],
-  providers: [EditorService, ArticleService, DestroyService]
+  imports: [ReactiveFormsModule, RouterModule, CommonModule, ErrorsFormComponent],
+  providers: [provideComponentStore(EditorStore)]
 })
-export class EditorComponent implements OnInit {
+export class EditorComponent {
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef);
-  private router = inject(Router);
-  private route = inject(ActivatedRoute);
+  private store = inject(EditorStore);
+  private article: Article | null = null;
 
-  private editorService = inject(EditorService);
-  private articleService = inject(ArticleService);
-  private authService = inject(AuthService);
-
-  private destroy$ = inject(DestroyService);
-  private _submit$ = new Subject<void>();
-
-  form = this.fb.nonNullable.group({
-    title: ['', [Validators.required]],
-    description: ['', [Validators.required]],
-    body: ['', [Validators.required]],
-    tagList: [<string[]>[]]
-  });
-  slug = '';
-
-  ngOnInit(): void {
-    this.route.paramMap
-      .pipe(
-        map((params) => params.get('slug')),
-        switchMap((slug) => {
-          if (!slug) return EMPTY;
-
-          this.slug = slug;
-          return this.articleService.getArticleBySlug(slug);
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (article) => {
-          if (article.author.username === this.authService.currentUser?.username) {
-            this.form.setValue({
-              title: article.title,
-              body: article.body,
-              description: article.description,
-              tagList: article.tagList
-            });
-          } else {
-            this.router.navigate(['/']);
-          }
-          this.cdr.markForCheck();
-        }
+  form!: FormGroup;
+  vm$ = this.store.vm$.pipe(
+    tap(({ article }) => {
+      this.article = article;
+      this.form = this.fb.nonNullable.group({
+        title: [article ? article.title : '', [Validators.required]],
+        description: [article ? article.description : '', [Validators.required]],
+        body: [article ? article.body : '', [Validators.required]],
+        tagList: [article ? article.tagList : <string[]>[]]
       });
-
-    this._submit$
-      .pipe(
-        exhaustMap(() => {
-          if (this.slug) {
-            return this.editorService
-              .updateArticle(this.slug, this.form.getRawValue())
-              .pipe(catchError(() => of({} as Article)));
-          }
-          return this.editorService
-            .createArticle(this.form.getRawValue())
-            .pipe(catchError(() => of({} as Article)));
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (article) => {
-          if (article && article.slug) this.router.navigate(['/', 'article', article.slug]);
-        }
-      });
-  }
+    })
+  );
 
   submit() {
-    this._submit$.next();
+    const formValue = this.form.getRawValue();
+    if (this.article) {
+      this.store.updateArticle(formValue);
+    } else {
+      this.store.createArticle(formValue);
+    }
   }
 
   addTag(tagInput: HTMLInputElement) {
     if (tagInput.value.trim()) {
-      this.form
-        .get('tagList')
-        ?.patchValue([...this.form.controls.tagList.value, tagInput.value.trim()]);
+      this.form.patchValue({
+        tagList: [...this.form.get('tagList')?.value, tagInput.value.trim()]
+      });
       tagInput.value = '';
     }
   }
 
   removeTag(tagRemove: string) {
-    this.form.controls.tagList.patchValue(
-      this.form.controls.tagList.value.filter((tag) => tag !== tagRemove)
-    );
+    this.form.patchValue({
+      tagList: this.form.get('tagList')?.value.filter((tag: string) => tag !== tagRemove)
+    });
   }
 }

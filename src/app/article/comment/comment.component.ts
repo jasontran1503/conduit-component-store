@@ -1,22 +1,15 @@
 import { CommonModule } from '@angular/common';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  Input,
-  OnInit
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, OnInit } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { catchError, exhaustMap, map, of, Subject, takeUntil, tap } from 'rxjs';
+import { provideComponentStore } from '@ngrx/component-store';
 import { Comment, User } from 'src/app/shared/data-access/app.models';
-import { DestroyService } from 'src/app/shared/data-access/destroy.service';
-import { CommentService } from '../../shared/data-access/apis/comment.service';
+import { CommentStore } from './comment.store';
 
 @Component({
   selector: 'conduit-comment[currentUser]',
-  template: `<form class="card comment-form" [formGroup]="form" (ngSubmit)="submit()">
+  template: `<ng-container *ngIf="vm$ | async as vm">
+    <form class="card comment-form" [formGroup]="form" (ngSubmit)="submit()" *ngIf="currentUser">
       <div class="card-block">
         <textarea
           class="form-control"
@@ -26,15 +19,20 @@ import { CommentService } from '../../shared/data-access/apis/comment.service';
         ></textarea>
       </div>
       <div class="card-footer">
-        <img [src]="currentUser.image" class="comment-author-img" />
+        <img
+          [src]="
+            currentUser ? currentUser.image : 'https://api.realworld.io/images/smiley-cyrus.jpeg'
+          "
+          class="comment-author-img"
+        />
         <button type="submit" class="btn btn-sm btn-primary" [disabled]="form.invalid">
           Post Comment
         </button>
       </div>
     </form>
 
-    <ng-container *ngIf="comments.length">
-      <div class="card" *ngFor="let comment of comments">
+    <ng-container *ngIf="vm.comments.length">
+      <div class="card" *ngFor="let comment of vm.comments">
         <div class="card-block">
           <p class="card-text">
             {{ comment.body }}
@@ -49,88 +47,42 @@ import { CommentService } from '../../shared/data-access/apis/comment.service';
             comment.author.username
           }}</a>
           <span class="date-posted">{{ comment.updatedAt | date: 'mediumDate' }}</span>
-          <span class="mod-options" *ngIf="currentUser.username === comment.author.username">
+          <span
+            class="mod-options"
+            *ngIf="currentUser && currentUser.username === comment.author.username"
+          >
             <i class="ion-trash-a" (click)="deleteComment(comment.id)"></i>
           </span>
         </div>
       </div>
-    </ng-container>`,
+    </ng-container>
+  </ng-container>`,
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [ReactiveFormsModule, RouterModule, CommonModule],
-  providers: [CommentService, DestroyService]
+  providers: [provideComponentStore(CommentStore)]
 })
 export class CommentComponent implements OnInit {
   @Input() currentUser!: User;
   @Input() slug = '';
 
   private fb = inject(FormBuilder);
-  private cdr = inject(ChangeDetectorRef);
+  private store = inject(CommentStore);
 
-  private service = inject(CommentService);
-  private destroy$ = inject(DestroyService);
-
-  private _create$ = new Subject<void>();
-  private _delete$ = new Subject<number>();
-
+  vm$ = this.store.vm$;
   form = this.fb.nonNullable.group({
     body: ['', Validators.required]
   });
-  comments: Comment[] = [];
 
   ngOnInit(): void {
-    this.service
-      .getComments(this.slug)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (comments) => {
-          this.comments = comments;
-          this.cdr.markForCheck();
-        }
-      });
-
-    this._create$
-      .pipe(
-        exhaustMap(() =>
-          this.service
-            .createComment(this.slug, this.form.getRawValue())
-            .pipe(catchError(() => of({} as Comment)))
-        ),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (comment) => {
-          if (comment && comment.body) {
-            this.comments = [...this.comments, comment];
-            this.form.reset();
-            this.cdr.markForCheck();
-          }
-        }
-      });
-
-    this._delete$
-      .pipe(
-        map((id) => id),
-        exhaustMap((id) =>
-          this.service.deleteComment(this.slug, id).pipe(
-            tap(() => (this.comments = this.comments.filter((comment) => comment.id !== id))),
-            catchError(() => of(null))
-          )
-        ),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (res) => {
-          if (res) this.cdr.markForCheck();
-        }
-      });
+    this.store.getComments(this.slug);
   }
 
   submit() {
-    this._create$.next();
+    this.store.createComment(this.form.getRawValue());
   }
 
   deleteComment(id: number) {
-    this._delete$.next(id);
+    this.deleteComment(id);
   }
 }

@@ -28,20 +28,20 @@ export const layoutRoutes: Routes = [
   },
   {
     path: 'editor',
-    canActivate: [AuthGuard],
-    canLoad: [AuthGuard],
+    // canActivate: [AuthGuard],
+    // canLoad: [AuthGuard],
     loadChildren: () => import('../editor/editor.routes').then((m) => m.editorRoutes)
   },
   {
     path: 'profile/:username',
-    canActivate: [AuthGuard],
-    canLoad: [AuthGuard],
+    // canActivate: [AuthGuard],
+    // canLoad: [AuthGuard],
     loadComponent: () => import('../profile/profile.component').then((m) => m.ProfileComponent)
   },
   {
     path: 'article/:slug',
-    canActivate: [AuthGuard],
-    canLoad: [AuthGuard],
+    // canActivate: [AuthGuard],
+    // canLoad: [AuthGuard],
     loadComponent: () => import('../article/article.component').then((m) => m.ArticleComponent)
   }
 ];

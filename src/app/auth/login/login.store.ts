@@ -26,9 +26,8 @@ export class LoginStore extends ComponentStore<LoginState> {
       this.loginService.login(loginUser).pipe(
         tapResponse(
           () => this.authStore.getCurrentUser(),
-          (err: { error: { errors: Record<string, string[]> } }) => {
-            this.patchState({ errors: err.error.errors });
-          }
+          (err: { error: { errors: Record<string, string[]> } }) =>
+            this.patchState({ errors: err.error.errors })
         )
       )
     )

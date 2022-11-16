@@ -31,6 +31,12 @@ export class AuthStore extends ComponentStore<AuthState> {
     { debounce: true }
   );
 
+  readonly username$ = this.select(
+    this.user$.pipe(filter((user): user is User => !!user)),
+    (user) => user.username,
+    { debounce: true }
+  );
+
   readonly vm$: Observable<AuthVm> = this.select(
     this.isAuthenticated$,
     this.user$,
@@ -54,7 +60,7 @@ export class AuthStore extends ComponentStore<AuthState> {
         tapResponse(
           (user) => {
             this.patchState({ user, status: !!user ? 'authenticated' : 'unauthenticated' });
-            this.router.navigate(['/']);
+            // this.router.navigate(['/']);
           },
           () => this.patchState({ user: null, status: 'unauthenticated' })
         )
@@ -66,6 +72,7 @@ export class AuthStore extends ComponentStore<AuthState> {
     tap(() => {
       localStorage.clear();
       this.patchState({ user: null, status: 'unauthenticated' });
+      this.router.navigate(['/']);
     })
   );
 }

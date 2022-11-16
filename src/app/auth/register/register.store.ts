@@ -26,9 +26,8 @@ export class RegisterStore extends ComponentStore<RegisterState> {
       this.registerService.register(user).pipe(
         tapResponse(
           () => this.authStore.getCurrentUser(),
-          (err: { error: { errors: Record<string, string[]> } }) => {
-            this.patchState({ errors: err.error.errors });
-          }
+          (err: { error: { errors: Record<string, string[]> } }) =>
+            this.patchState({ errors: err.error.errors })
         )
       )
     )

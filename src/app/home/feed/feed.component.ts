@@ -14,7 +14,7 @@ import { AuthService } from 'src/app/shared/data-access/auth.service';
   selector: 'conduit-feed',
   template: `<div class="feed-toggle">
     <ul class="nav nav-pills outline-active">
-      <li class="nav-item">
+      <li class="nav-item" *ngIf="isAuthenticated">
         <a
           class="nav-link"
           [class.active]="feedType === 'feed' && !selectedTag"
@@ -40,11 +40,9 @@ import { AuthService } from 'src/app/shared/data-access/auth.service';
   imports: [CommonModule]
 })
 export class FeedComponent {
-  private authService = inject(AuthService);
-
   feedType: FeedType = 'global';
-  isAuthenticated = this.authService.isAuthenticated;
 
+  @Input() isAuthenticated = false;
   @Input() selectedTag = '';
   @Output() selectFeed = new EventEmitter<FeedType>();
 

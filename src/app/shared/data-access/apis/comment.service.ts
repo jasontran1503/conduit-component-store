@@ -15,17 +15,17 @@ export class CommentService {
 
   getComments(slug: string) {
     return this.http
-      .get<MultipleCommentsResponse>(`${this.apiUrl}/articles/${slug}/comments`)
+      .get<MultipleCommentsResponse>(`${this.apiUrl}articles/${slug}/comments`)
       .pipe(map((res) => res.comments));
   }
 
   createComment(slug: string, comment: NewComment) {
     return this.http
-      .post<SingleCommentResponse>(`${this.apiUrl}/articles/${slug}/comments`, { comment })
+      .post<SingleCommentResponse>(`${this.apiUrl}articles/${slug}/comments`, { comment })
       .pipe(map((res) => res.comment));
   }
 
   deleteComment(slug: string, id: number) {
-    return this.http.delete(`${this.apiUrl}/articles/${slug}/comments/${id}`);
+    return this.http.delete(`${this.apiUrl}articles/${slug}/comments/${id}`);
   }
 }
