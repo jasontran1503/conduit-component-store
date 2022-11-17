@@ -31,7 +31,7 @@ import { HomeStore } from './home.store';
 
             <conduit-article-list
               [articles]="vm.articles"
-              [loading]="vm.articlesStatus"
+              [status]="vm.articlesStatus"
             ></conduit-article-list>
           </div>
 
@@ -40,7 +40,7 @@ import { HomeStore } from './home.store';
               <p>Popular Tags</p>
               <conduit-tags
                 [tags]="vm.tags"
-                [loading]="vm.tagsStatus"
+                [status]="vm.tagsStatus"
                 (selectTag)="selectTag($event)"
               ></conduit-tags>
             </div>

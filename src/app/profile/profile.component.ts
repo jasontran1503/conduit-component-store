@@ -68,7 +68,7 @@ import { ProfileStore } from './profile.store';
                 </div>
                 <conduit-article-list
                   [articles]="vm.articles"
-                  [loading]="vm.articlesStatus"
+                  [status]="vm.articlesStatus"
                 ></conduit-article-list>
               </div>
             </div>

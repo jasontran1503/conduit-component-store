@@ -8,7 +8,7 @@ import { FavoriteButtonComponent } from '../buttons/favorite-button/favorite-but
 @Component({
   selector: 'conduit-article-list',
   template: `
-    <ng-container *ngIf="loading !== 'loading'; else loadingTpl">
+    <ng-container *ngIf="status !== 'loading'; else loadingTpl">
       <ng-container *ngIf="articles && articles.length; else noArticles">
         <ng-container *ngFor="let article of articles">
           <div class="article-preview">
@@ -47,7 +47,7 @@ import { FavoriteButtonComponent } from '../buttons/favorite-button/favorite-but
 })
 export class ArticleListComponent {
   @Input() articles: Article[] = [];
-  @Input() loading: ApiStatus = 'idle';
+  @Input() status: ApiStatus = 'idle';
 
   toggleFavorite(article: Article) {
     this.articles = [...this.articles].map((item) => (item.slug === article.slug ? article : item));
