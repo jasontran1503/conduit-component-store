@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { defer, filter, Observable, pipe, switchMap, of, tap } from 'rxjs';
+import { defer, filter, Observable, of, switchMap, tap } from 'rxjs';
 import { AuthStatus, User } from './app.models';
 import { AuthService } from './auth.service';
 
@@ -31,11 +31,7 @@ export class AuthStore extends ComponentStore<AuthState> {
     { debounce: true }
   );
 
-  readonly username$ = this.select(
-    this.user$.pipe(filter((user): user is User => !!user)),
-    (user) => user.username,
-    { debounce: true }
-  );
+  readonly username$ = this.select((s) => s.user?.username);
 
   readonly vm$: Observable<AuthVm> = this.select(
     this.isAuthenticated$,
@@ -48,6 +44,11 @@ export class AuthStore extends ComponentStore<AuthState> {
     super(initialAuthState);
   }
 
+  reAuthenticated() {
+    this.getCurrentUser();
+    this.router.navigate(['/']);
+  }
+
   readonly getCurrentUser = this.effect<void>(
     switchMap(() =>
       defer(() => {
@@ -58,10 +59,7 @@ export class AuthStore extends ComponentStore<AuthState> {
         return of(null);
       }).pipe(
         tapResponse(
-          (user) => {
-            this.patchState({ user, status: !!user ? 'authenticated' : 'unauthenticated' });
-            // this.router.navigate(['/']);
-          },
+          (user) => this.patchState({ user, status: !!user ? 'authenticated' : 'unauthenticated' }),
           () => this.patchState({ user: null, status: 'unauthenticated' })
         )
       )

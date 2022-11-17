@@ -4,6 +4,8 @@ export type FeedType = 'feed' | 'global';
 
 export type AuthStatus = 'idle' | 'authenticated' | 'unauthenticated';
 
+export type ProfileArticlesType = 'author' | 'favorited';
+
 export interface LoginUser {
   email: string;
   password: string;

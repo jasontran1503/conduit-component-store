@@ -1,17 +1,14 @@
 import {
   ChangeDetectionStrategy,
-  ChangeDetectorRef,
   Component,
   EventEmitter,
   inject,
   Input,
-  OnInit,
   Output
 } from '@angular/core';
-import { catchError, exhaustMap, of, Subject, takeUntil } from 'rxjs';
-import { FollowButtonService } from 'src/app/shared/data-access/apis/follow-button.service';
+import { provideComponentStore } from '@ngrx/component-store';
 import { Profile } from 'src/app/shared/data-access/app.models';
-import { DestroyService } from 'src/app/shared/data-access/destroy.service';
+import { FollowButtonStore } from './follow-button.store';
 
 @Component({
   selector: 'conduit-follow-button',
@@ -22,40 +19,20 @@ import { DestroyService } from 'src/app/shared/data-access/destroy.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: true,
   imports: [],
-  providers: [DestroyService]
+  providers: [provideComponentStore(FollowButtonStore)]
 })
-export class FollowButtonComponent implements OnInit {
+export class FollowButtonComponent {
   @Input() following = false;
   @Input() username = '';
   @Output() toggleFollow = new EventEmitter<Profile>();
 
-  private cdr = inject(ChangeDetectorRef);
-  private service = inject(FollowButtonService);
-  private destroy$ = inject(DestroyService);
-  private _click$ = new Subject<void>();
-
-  ngOnInit() {
-    this._click$
-      .pipe(
-        exhaustMap(() =>
-          this.service
-            .toggleFollow(this.following, this.username)
-            .pipe(catchError(() => of({} as Profile)))
-        ),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (profile) => {
-          if (profile && profile.username) {
-            this.following = !this.following;
-            this.toggleFollow.emit(profile);
-            this.cdr.markForCheck();
-          }
-        }
-      });
-  }
+  private store = inject(FollowButtonStore);
 
   click() {
-    this._click$.next();
+    this.store.toggleFollow({
+      following: this.following,
+      username: this.username,
+      event: this.toggleFollow
+    });
   }
 }

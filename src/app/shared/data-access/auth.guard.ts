@@ -2,11 +2,11 @@ import { inject, Injectable } from '@angular/core';
 import { CanActivate, CanActivateChild, CanLoad, Router } from '@angular/router';
 import { take } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AuthService } from './auth.service';
+import { AuthStore } from './auth.store';
 
 @Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
-  private authService = inject(AuthService);
+  private authStore = inject(AuthStore);
   private router = inject(Router);
 
   canLoad() {
@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad {
   }
 
   private isAuthenticated() {
-    return this.authService.isAuthenticated$.pipe(
+    return this.authStore.isAuthenticated$.pipe(
       map((isAuthenticated) => {
         if (isAuthenticated) return isAuthenticated;
         return this.router.parseUrl('/');

@@ -17,7 +17,7 @@ export class SettingsStore extends ComponentStore<{}> {
     exhaustMap((user) =>
       this.settingsService.update(user).pipe(
         tapResponse(
-          () => this.authStore.getCurrentUser(),
+          () => this.authStore.reAuthenticated(),
           () => {}
         )
       )

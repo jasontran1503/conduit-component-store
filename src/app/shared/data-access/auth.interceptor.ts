@@ -9,7 +9,7 @@ import {
 } from '@angular/common/http';
 import { inject, Injectable, Provider } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, EMPTY, Observable } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -37,9 +37,9 @@ export class ErrorsInterceptor implements HttpInterceptor {
       catchError((err: HttpErrorResponse) => {
         if (err.status === HttpStatusCode.Unauthorized) {
           localStorage.removeItem('conduit-token');
-          this.router.navigate(['/']);
+          this.router.navigate(['/login']);
         }
-        return throwError(() => new Error(err.error));
+        return EMPTY;
       })
     );
   }
@@ -51,11 +51,11 @@ export function provideAuthInterceptor(): Provider {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorsInterceptor,
+      multi: true
     }
-    // {
-    //   provide: HTTP_INTERCEPTORS,
-    //   useClass: ErrorsInterceptor,
-    //   multi: true
-    // }
   ];
 }

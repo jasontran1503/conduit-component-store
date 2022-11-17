@@ -83,6 +83,6 @@ export class CommentComponent implements OnInit {
   }
 
   deleteComment(id: number) {
-    this.deleteComment(id);
+    this.store.deleteComment(id);
   }
 }

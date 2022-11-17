@@ -70,11 +70,11 @@ export class ArticleComponent {
   vm$ = this.store.vm$;
 
   toggleFavorite(article: Article) {
-    // this.article = article;
+    this.store.toggleFavorite(article);
   }
 
   toggleFollow(author: Profile) {
-    // this.article = { ...this.article, author };
+    this.store.toggleFollow(author);
   }
 
   deleteArticle(article: Article) {

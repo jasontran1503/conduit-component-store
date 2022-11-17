@@ -2,7 +2,7 @@ import { exhaustMap, map, Observable, switchMap, tap } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ComponentStore, OnStateInit, tapResponse } from '@ngrx/component-store';
 import { Injectable } from '@angular/core';
-import { Article, User } from 'src/app/shared/data-access/app.models';
+import { Article, Profile, User } from 'src/app/shared/data-access/app.models';
 import { AuthStore } from '../shared/data-access/auth.store';
 import { ArticleService } from '../shared/data-access/apis/article.service';
 
@@ -72,4 +72,14 @@ export class ArticleStore extends ComponentStore<ArticleState> implements OnStat
       )
     )
   );
+
+  readonly toggleFollow = this.effect<Profile>(
+    tap((author) =>
+      this.patchState((state) => ({
+        article: { ...state.article!, author }
+      }))
+    )
+  );
+
+  readonly toggleFavorite = this.effect<Article>(tap((article) => this.patchState({ article })));
 }

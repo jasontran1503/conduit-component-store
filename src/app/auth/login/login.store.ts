@@ -25,7 +25,7 @@ export class LoginStore extends ComponentStore<LoginState> {
     exhaustMap((loginUser) =>
       this.loginService.login(loginUser).pipe(
         tapResponse(
-          () => this.authStore.getCurrentUser(),
+          () => this.authStore.reAuthenticated(),
           (err: { error: { errors: Record<string, string[]> } }) =>
             this.patchState({ errors: err.error.errors })
         )
