@@ -1,6 +1,6 @@
-import { exhaustMap } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
+import { exhaustMap } from 'rxjs';
 import { SettingsService } from '../shared/data-access/apis/settings.service';
 import { UpdateUser } from '../shared/data-access/app.models';
 import { AuthStore } from '../shared/data-access/auth.store';

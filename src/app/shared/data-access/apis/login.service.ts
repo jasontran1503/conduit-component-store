@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, tap } from 'rxjs';
 import { LoginUser, UserResponse } from 'src/app/shared/data-access/app.models';
-import { AuthService } from 'src/app/shared/data-access/auth.service';
 import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })

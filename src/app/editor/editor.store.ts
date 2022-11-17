@@ -7,17 +7,17 @@ import { EditorService } from '../shared/data-access/apis/editor.service';
 import { Article, NewArticle, UpdateArticle } from '../shared/data-access/app.models';
 import { AuthStore } from '../shared/data-access/auth.store';
 
-export interface EditorState {
+interface EditorState {
   article: Article | null;
   errors: Record<string, string[]>;
 }
 
-export const initialEditorState: EditorState = {
+const initialEditorState: EditorState = {
   article: null,
   errors: {}
 };
 
-export type EditorVm = EditorState & {
+type EditorVm = EditorState & {
   username: string;
 };
 

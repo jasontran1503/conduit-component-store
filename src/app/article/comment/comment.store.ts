@@ -1,15 +1,15 @@
-import { pipe, tap, switchMap, withLatestFrom, exhaustMap } from 'rxjs';
-import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { Injectable } from '@angular/core';
-import { Comment, NewComment } from 'src/app/shared/data-access/app.models';
+import { ComponentStore, tapResponse } from '@ngrx/component-store';
+import { exhaustMap, pipe, switchMap, tap, withLatestFrom } from 'rxjs';
 import { CommentService } from 'src/app/shared/data-access/apis/comment.service';
+import { Comment, NewComment } from 'src/app/shared/data-access/app.models';
 
-export interface CommentState {
+interface CommentState {
   comments: Comment[];
   slug: string;
 }
 
-export const initialCommentState: CommentState = {
+const initialCommentState: CommentState = {
   comments: [],
   slug: ''
 };

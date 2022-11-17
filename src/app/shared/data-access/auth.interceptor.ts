@@ -9,7 +9,7 @@ import {
 } from '@angular/common/http';
 import { inject, Injectable, Provider } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, EMPTY, Observable } from 'rxjs';
+import { catchError, EMPTY, Observable, of, throwError } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -39,7 +39,7 @@ export class ErrorsInterceptor implements HttpInterceptor {
           localStorage.removeItem('conduit-token');
           this.router.navigate(['/login']);
         }
-        return EMPTY;
+        return throwError(() => err);
       })
     );
   }

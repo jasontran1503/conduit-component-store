@@ -1,13 +1,11 @@
-import { provideComponentStore } from '@ngrx/component-store';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DestroyService } from '../shared/data-access/destroy.service';
+import { provideComponentStore } from '@ngrx/component-store';
+import { FeedType } from '../shared/data-access/app.models';
 import { ArticleListComponent } from '../shared/ui/article-list/article-list.component';
 import { FeedComponent } from './feed/feed.component';
-import { HomeService } from '../shared/data-access/apis/home.service';
-import { TagsComponent } from './tags/tags.component';
-import { FeedType } from '../shared/data-access/app.models';
 import { HomeStore } from './home.store';
+import { TagsComponent } from './tags/tags.component';
 
 @Component({
   selector: 'conduit-home',

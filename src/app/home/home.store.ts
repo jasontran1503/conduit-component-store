@@ -1,11 +1,11 @@
-import { Observable, filter, pipe, tap, switchMap, defer } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { ComponentStore, OnStateInit, tapResponse } from '@ngrx/component-store';
+import { defer, filter, Observable, pipe, switchMap, tap } from 'rxjs';
+import { HomeService } from '../shared/data-access/apis/home.service';
 import { ApiStatus, Article, FeedType, TagsResponse } from '../shared/data-access/app.models';
 import { AuthStore } from '../shared/data-access/auth.store';
-import { HomeService } from '../shared/data-access/apis/home.service';
 
-export interface HomeState {
+interface HomeState {
   articles: Article[];
   tags: TagsResponse['tags'];
   feedType: FeedType;
@@ -14,7 +14,7 @@ export interface HomeState {
   tagsStatus: ApiStatus;
 }
 
-export const initialHomeState: HomeState = {
+const initialHomeState: HomeState = {
   articles: [],
   tags: [],
   feedType: 'global',
@@ -23,7 +23,7 @@ export const initialHomeState: HomeState = {
   tagsStatus: 'idle'
 };
 
-export type HomeVm = HomeState & {
+type HomeVm = HomeState & {
   isAuthenticated: boolean;
 };
 

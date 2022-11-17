@@ -6,7 +6,7 @@ import { ApiStatus, Article, Profile, ProfileArticlesType } from '../shared/data
 import { AuthStore } from '../shared/data-access/auth.store';
 import { ProfileService } from './../shared/data-access/apis/profile.service';
 
-export interface ProfileState {
+interface ProfileState {
   profile: Profile | null;
   articles: Article[];
   isOwner: boolean;
@@ -14,7 +14,7 @@ export interface ProfileState {
   articlesStatus: ApiStatus;
 }
 
-export const initialProfileState: ProfileState = {
+const initialProfileState: ProfileState = {
   profile: null,
   articles: [],
   isOwner: false,

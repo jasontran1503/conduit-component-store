@@ -1,22 +1,22 @@
-import { exhaustMap, map, Observable, switchMap, tap } from 'rxjs';
+import { Injectable } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ComponentStore, OnStateInit, tapResponse } from '@ngrx/component-store';
-import { Injectable } from '@angular/core';
+import { exhaustMap, map, Observable, switchMap, tap } from 'rxjs';
 import { Article, Profile, User } from 'src/app/shared/data-access/app.models';
-import { AuthStore } from '../shared/data-access/auth.store';
 import { ArticleService } from '../shared/data-access/apis/article.service';
+import { AuthStore } from '../shared/data-access/auth.store';
 
-export interface ArticleState {
+interface ArticleState {
   article: Article | null;
   slug: string;
 }
 
-export const initialArticleState: ArticleState = {
+const initialArticleState: ArticleState = {
   article: null,
   slug: ''
 };
 
-export type ArticleVm = ArticleState & {
+type ArticleVm = ArticleState & {
   isOwner: boolean;
   currentUser: User;
 };

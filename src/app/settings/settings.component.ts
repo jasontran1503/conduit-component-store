@@ -1,19 +1,9 @@
-import { provideComponentStore } from '@ngrx/component-store';
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  inject,
-  OnInit
-} from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { catchError, exhaustMap, of, Subject, takeUntil, tap } from 'rxjs';
-import { User } from '../shared/data-access/app.models';
-import { AuthService } from '../shared/data-access/auth.service';
-import { DestroyService } from '../shared/data-access/destroy.service';
-import { SettingsService } from '../shared/data-access/apis/settings.service';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { provideComponentStore } from '@ngrx/component-store';
+import { tap } from 'rxjs';
 import { SettingsStore } from './settings.store';
 
 @Component({

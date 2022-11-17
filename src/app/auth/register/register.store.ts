@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
 import { exhaustMap } from 'rxjs';
 import { RegisterService } from 'src/app/shared/data-access/apis/register.service';
-import { LoginUser, NewUser } from 'src/app/shared/data-access/app.models';
+import { NewUser } from 'src/app/shared/data-access/app.models';
 import { AuthStore } from 'src/app/shared/data-access/auth.store';
 
-export interface RegisterState {
+interface RegisterState {
   errors: Record<string, string[]>;
 }
 
-export const initialRegisterState: RegisterState = {
+const initialRegisterState: RegisterState = {
   errors: {}
 };
 
@@ -26,8 +26,10 @@ export class RegisterStore extends ComponentStore<RegisterState> {
       this.registerService.register(user).pipe(
         tapResponse(
           () => this.authStore.reAuthenticated(),
-          (err: { error: { errors: Record<string, string[]> } }) =>
-            this.patchState({ errors: err.error.errors })
+          (err: { error: { errors: Record<string, string[]> } }) => {
+            console.log(err);
+            this.patchState({ errors: err.error.errors });
+          }
         )
       )
     )

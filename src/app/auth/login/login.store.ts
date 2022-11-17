@@ -5,11 +5,11 @@ import { LoginService } from 'src/app/shared/data-access/apis/login.service';
 import { LoginUser } from 'src/app/shared/data-access/app.models';
 import { AuthStore } from 'src/app/shared/data-access/auth.store';
 
-export interface LoginState {
+interface LoginState {
   errors: Record<string, string[]>;
 }
 
-export const initialLoginState: LoginState = {
+const initialLoginState: LoginState = {
   errors: {}
 };
 
